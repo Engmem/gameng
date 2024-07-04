@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      CONFIG_PATH: /app/config/local.yaml
+    volumes:
+      - ./config:/app/config
+    ports:
+      - "5051:5051"
