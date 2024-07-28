@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"fmt"
-	wordgrpc "gameng/internal/port/grpc"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"google.golang.org/grpc"
@@ -11,6 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 	"log/slog"
 	"net"
+	wordgrpc "wordbox/internal/port/grpc"
 )
 
 type App struct {

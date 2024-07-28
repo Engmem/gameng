@@ -1,10 +1,10 @@
 package app
 
 import (
-	grpcapp "gameng/internal/app/grpc"
-	"gameng/internal/config"
-	wsmock "gameng/internal/service/mock"
 	"log/slog"
+	grpcapp "wordbox/internal/app/grpc"
+	"wordbox/internal/config"
+	wsmock "wordbox/internal/service/mock"
 )
 
 type App struct {

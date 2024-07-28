@@ -2,40 +2,40 @@ package wordgrpc
 
 import (
 	"context"
-	"gameng/internal/domain"
-	gamengv1 "github.com/Engmem/gameng-api/gen/go/proto/gameng"
+	gamengv02 "github.com/Engmem/wordbox-api/gen/go/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"wordbox/internal/domain"
 )
 
 type WordService interface {
-	GetNewWords(ctx context.Context, userID uint64) ([]*domain.WordCard, error)
-	GetWords(ctx context.Context, offset uint64) ([]*domain.WordCard, error)
+	AddNewWords(ctx context.Context, UUID string) ([]*domain.WordCard, error)
+	GetWordsToRepeat(ctx context.Context, UUID string) ([]*domain.WordCard, error)
 }
 
 type WordServer struct {
 	WordService WordService
-	gamengv1.UnimplementedGamengServer
+	gamengv02.UnimplementedWordboxServer
 }
 
 func Register(s *grpc.Server, ws WordService) {
-	gamengv1.RegisterGamengServer(s, &WordServer{
+	gamengv02.RegisterWordboxServer(s, &WordServer{
 		WordService: ws,
 	})
 }
 
-func (ws *WordServer) GetNewWords(ctx context.Context, req *gamengv1.GetNewWordsRequest) (*gamengv1.GetNewWordsResponse, error) {
-	if req.UserId == 0 {
+func (ws *WordServer) AddNewWords(ctx context.Context, req *gamengv02.AddNewWordsRequest) (*gamengv02.AddNewWordsResponse, error) {
+	if req.Uuid == "" {
 		return nil, status.Error(codes.InvalidArgument, "user id must not be empty")
 	}
 
-	words, err := ws.WordService.GetNewWords(ctx, req.UserId)
+	words, err := ws.WordService.AddNewWords(ctx, req.Uuid)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	resp := &gamengv1.GetNewWordsResponse{
+	resp := &gamengv02.AddNewWordsResponse{
 		WordsTranslations: make(map[string]string, len(words)),
 	}
 	for _, word := range words {
@@ -45,71 +45,21 @@ func (ws *WordServer) GetNewWords(ctx context.Context, req *gamengv1.GetNewWords
 	return resp, nil
 }
 
-func (ws *WordServer) GetWordWithTranslations(ctx context.Context, req *gamengv1.GetWordsWithTranslationsRequest) (*gamengv1.GetWordsWithTranslationsResponse, error) {
-	words, err := ws.WordService.GetWords(ctx, req.Offset)
+func (ws *WordServer) GetWordsToRepeat(ctx context.Context, req *gamengv02.GetWordsToRepeatRequest) (*gamengv02.GetWordsToRepeatResponse, error) {
+	if req.Uuid == "" {
+		return nil, status.Error(codes.InvalidArgument, "user id must not be empty")
+	}
+
+	words, err := ws.WordService.GetWordsToRepeat(ctx, req.Uuid)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	resp := &gamengv1.GetWordsWithTranslationsResponse{
+	resp := &gamengv02.GetWordsToRepeatResponse{
 		WordsTranslations: make(map[string]string, len(words)),
 	}
-
 	for _, word := range words {
 		resp.WordsTranslations[word.Word] = word.Translation
-	}
-
-	return resp, nil
-}
-
-func (ws *WordServer) GetWordByAudio(ctx context.Context, req *gamengv1.GetWordsByAudioRequest) (*gamengv1.GetWordsByAudioResponse, error) {
-	words, err := ws.WordService.GetWords(ctx, req.Offset)
-	if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
-	}
-
-	resp := &gamengv1.GetWordsByAudioResponse{
-		AudioTranslationPairs: make([]*gamengv1.AudioTranslationPair, 0, len(words)),
-	}
-
-	for _, word := range words {
-		resp.AudioTranslationPairs = append(resp.AudioTranslationPairs, &gamengv1.AudioTranslationPair{
-			Audio:       word.Audio,
-			Translation: word.Translation,
-		})
-	}
-
-	return resp, nil
-}
-func (ws *WordServer) GetSentencesWithMissingWord(ctx context.Context, req *gamengv1.GetSentencesWithMissingWordRequest) (*gamengv1.GetSentencesWithMissingWordResponse, error) {
-	words, err := ws.WordService.GetWords(ctx, req.Offset)
-	if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
-	}
-
-	resp := &gamengv1.GetSentencesWithMissingWordResponse{
-		SentencesWords: make(map[string]string, len(words)),
-	}
-
-	for _, word := range words {
-		resp.SentencesWords[word.Sentence] = word.Word
-	}
-
-	return resp, nil
-}
-func (ws *WordServer) GetWordForTranslation(ctx context.Context, req *gamengv1.GetWordForTranslationRequest) (*gamengv1.GetWordForTranslationResponse, error) {
-	words, err := ws.WordService.GetWords(ctx, req.Offset)
-	if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
-	}
-
-	resp := &gamengv1.GetWordForTranslationResponse{
-		WordsTranslations: make(map[string]string, len(words)),
-	}
-
-	for _, word := range words {
-		// for translation game, we need to swap word and translation
-		resp.WordsTranslations[word.Translation] = word.Word
 	}
 
 	return resp, nil

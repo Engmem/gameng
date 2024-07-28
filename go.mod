@@ -1,9 +1,10 @@
-module gameng
+module wordbox
 
 go 1.22.4
 
 require (
-	github.com/Engmem/gameng-api v0.1.1
+	github.com/Engmem/wordbox-api v0.2.2
+	github.com/fatih/color v1.17.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	google.golang.org/grpc v1.65.0
@@ -12,6 +13,8 @@ require (
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect

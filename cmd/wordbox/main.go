@@ -1,12 +1,12 @@
 package main
 
 import (
-	"gameng/internal/app"
-	"gameng/internal/config"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
+	"wordbox/internal/app"
+	"wordbox/internal/config"
 )
 
 func main() {
